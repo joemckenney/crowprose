@@ -1,10 +1,23 @@
+@font-face {
+  font-family: "DIN 1451 Std Engschrift";
+  font-style: normal;
+  font-weight: normal;
+  src: url("../font/din-1451/DINEngschriftStd.woff") format("woff");
+}
+
+@font-face {
+  font-family: "DIN 1451 Std Mittelschrift";
+  font-style: normal;
+  font-weight: normal;
+  src: url("../font/din-1451/DINMittelschriftStd.woff") format("woff");
+}
 body {
+  font-family: "DIN 1451 Std Mittelschrift";
   display: flex;
   flex-direction: column;
   padding: 2rem;
   margin: 0;
   gap: 1.25rem;
-  font-family: sans-serif;
   margin: 0;
 }
 h1 {
