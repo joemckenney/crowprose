@@ -1,7 +1,7 @@
 export default function Projects() {
-  return (
-    <>
-      <h1>crowprose::projects</h1>
-    </>
-  );
+	return (
+		<>
+			<h1>crowprose::projects</h1>
+		</>
+	);
 }
