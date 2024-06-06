@@ -26,27 +26,27 @@ function App() {
             <Tile
               title="pkg-tools"
               description="An opinionated TS package build toolchain w/ typed configuration."
-            ></Tile>
+            />
             <Tile
               title="userstate"
               description="A state machine implementation, used internal to Dopt."
-            ></Tile>
+            />
             <Tile
               title="please"
               description="A CLI for developing in monorepos, not building them."
-            ></Tile>
+            />
             <Tile
               title="dexl"
               description="Dopt's expression language, including a grammar, parser, and evaluator."
-            ></Tile>
+            />
             <Tile
               title="odopt"
               description="Open source artifacts from Dopt, the company I started in 2021."
-            ></Tile>
+            />
             <Tile
               title="mercator"
               description="A map implementation that allows for objects as keys without key equality constraints."
-            ></Tile>
+            />
           </div>
         </div>
         <div className={section.container}>
@@ -55,7 +55,7 @@ function App() {
             <Tile
               title="Open sourcing code from a private monorepo"
               description="A how-to style blog post"
-            ></Tile>
+            />
           </div>
         </div>
       </div>
