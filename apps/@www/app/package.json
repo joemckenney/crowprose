@@ -3,9 +3,22 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "exports": {
+    "./template": {
+      "types": "./dist/template/index.d.ts",
+      "import": "./dist/template/template.js"
+    },
+    "./ssr": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/entry-server.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "pnpm run --stream --color \"/build:/\"",
+    "build:client": "vite build --outDir dist/client",
+    "build:server": "vite build -c ./vite.server.config.ts --ssr src/entry-server.tsx --outDir dist/server",
+    "build:template": "vite build -c ./vite.template.config.ts --ssr src/template.ts --outDir dist/template",
     "format": "biome format --write ./src",
     "lint": "biome lint ./src",
     "preview": "vite preview"
@@ -18,11 +31,17 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.0",
+    "@types/node": "20.14.2",
     "@types/react": "18.2.66",
     "@types/react-dom": "18.2.22",
     "@vanilla-extract/vite-plugin": "4.0.10",
     "@vitejs/plugin-react": "4.2.1",
+    "compression": "1.7.4",
+    "cross-env": "7.0.3",
+    "express": "4.19.2",
+    "serve-static": "1.15.0",
     "typescript": "5.2.2",
-    "vite": "5.2.0"
+    "vite": "5.2.0",
+    "vite-plugin-dts": "3.9.1"
   }
 }

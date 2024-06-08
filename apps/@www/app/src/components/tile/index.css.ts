@@ -5,6 +5,7 @@ export const tile = style({
   padding: "6px 0",
   maxWidth: "200px",
   display: "flex",
+  flex: "1 1 0px",
   flexDirection: "column",
   gap: "6px",
 });

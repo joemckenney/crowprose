@@ -35,6 +35,7 @@ export const section = {
   }),
   content: style({
     display: "flex",
+    flexWrap: "wrap",
     gap: "1em",
   }),
 };

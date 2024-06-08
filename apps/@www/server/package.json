@@ -1,0 +1,45 @@
+{
+  "name": "@www/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      }
+    }
+  },
+  "module": "./dist/index.mjs",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "build",
+    "clean": "clean",
+    "dev": "build -w",
+    "format": "format",
+    "formatcheck": "format -c",
+    "lint": "lint",
+    "stub": "build -s",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@www/app": "workspace:*",
+    "express": "4.19.2",
+    "serve-static": "1.15.0"
+  },
+  "devDependencies": {
+    "@pkg-tools/build": "1.0.2",
+    "@pkg-tools/clean": "1.0.1",
+    "@pkg-tools/config": "1.0.8",
+    "@pkg-tools/format": "1.0.5",
+    "@pkg-tools/lint": "1.0.7",
+    "@types/express": "4.17.21",
+    "@types/serve-static": "1.15.7",
+    "compression": "1.7.4",
+    "cross-env": "7.0.3",
+    "typescript": "5.3.3"
+  }
+}
