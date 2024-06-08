@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload dist folder
-          path: './apps/@www/app/dist'
+          path: './apps/@www/app/dist/client'
 
       - name: Deploy to GitHub Pages
         id: deployment
