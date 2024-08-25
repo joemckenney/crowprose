@@ -19,6 +19,7 @@ function App() {
           husband, and lifelong athlete.
         </h2>
       </div>
+      {/*
       <div className={sections.container}>
         <div className={section.container}>
           <div className={section.heading}>PROJECTS</div>
@@ -59,6 +60,7 @@ function App() {
           </div>
         </div>
       </div>
+        */}
     </>
   );
 }
