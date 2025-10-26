@@ -19,6 +19,8 @@
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build -c ./vite.server.config.ts --ssr src/entry-server.tsx --outDir dist/server",
     "build:template": "vite build -c ./vite.template.config.ts --ssr src/template.ts --outDir dist/template",
+    "build:prerender": "vite build -c ./vite.prerender.config.ts",
+    "build:ssg": "pnpm build:client && pnpm build:server && pnpm build:prerender && node dist/server/prerender.js",
     "format": "biome format --write ./src",
     "lint": "biome lint ./src",
     "preview": "vite preview"

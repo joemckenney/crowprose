@@ -1,11 +1,13 @@
-import { Fragment, lazy, Suspense } from "react";
+import { Fragment } from "react";
 import type { ComponentType } from "react";
 import { Routes as Switch, Route } from "react-router-dom";
 
 const PRESERVED = import.meta.glob("/src/pages/(_app|404).page.tsx", {
 	eager: true,
 }) as Record<string, any>;
-const ROUTES = import.meta.glob("/src/pages/**/[a-z[]*.page.tsx");
+const ROUTES = import.meta.glob("/src/pages/**/[a-z[]*.page.tsx", {
+	eager: true,
+}) as Record<string, any>;
 
 const preservedRoutes: Partial<Record<string, () => JSX.Element>> = Object.keys(
 	PRESERVED,
@@ -16,7 +18,7 @@ const preservedRoutes: Partial<Record<string, () => JSX.Element>> = Object.keys(
 	return { ...routes, [route]: PRESERVED[path]?.default };
 }, {});
 
-type RouteType = Record<string, () => Promise<{ default: ComponentType<any> }>>;
+type RouteType = Record<string, { default: ComponentType<any> }>;
 const regularRoutes = Object.keys(ROUTES as RouteType).reduce(
 	(routes, path) => {
 		let route = path
@@ -39,11 +41,15 @@ const regularRoutes = Object.keys(ROUTES as RouteType).reduce(
 		while (route.match(/\[(.+?)\]/)) {
 			route = route.replace(/\[(.+?)\]/, ":$1");
 		}
+
+		const module = (ROUTES as RouteType)[path];
+		const Component = module.default;
+
 		return {
 			...routes,
 			[route]: {
 				route,
-				Component: lazy((ROUTES as RouteType)[path]),
+				Component,
 			},
 		};
 	},
@@ -60,15 +66,7 @@ export const Routes = (): JSX.Element => {
 				<>
 					{Object.values(regularRoutes).map(
 						({ route, Component = Fragment }: any) => (
-							<Route
-								key={route}
-								path={route}
-								element={
-									<Suspense fallback={<>...</>}>
-										<Component />
-									</Suspense>
-								}
-							/>
+							<Route key={route} path={route} element={<Component />} />
 						),
 					)}
 					<Route path="*" element={<NotFound />} />

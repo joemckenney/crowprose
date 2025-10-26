@@ -97,7 +97,6 @@ export const contributionBadge = style({
       borderColor: vars.color.black,
     },
     '&[data-type="issue"]': {
-      color: vars.color.black,
       borderColor: vars.color.black,
       backgroundColor: vars.color.black,
       color: "white",
