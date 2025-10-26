@@ -11,22 +11,91 @@
   font-weight: normal;
   src: url("../font/din-1451/DINMittelschriftStd.woff") format("woff");
 }
+
+/* CSS Reset - minimal, opinionated */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
-  font-family: "DIN 1451 Std Mittelschrift";
-  display: flex;
-  flex-direction: column;
-  padding: 2rem;
-  margin: 0;
-  gap: 1.25rem;
-  margin: 0;
+  font-family: "DIN 1451 Std Mittelschrift", -apple-system, system-ui, sans-serif;
+  color: #1a1a1a;
+  background-color: #ffffff;
+  line-height: 1.5;
+  min-height: 100vh;
 }
+
+/* Typography - newspaper inspired */
+h1, h2, h3, h4, h5, h6 {
+  font-family: "DIN 1451 Std Engschrift", -apple-system, system-ui, sans-serif;
+  font-weight: normal;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
 h1 {
-  margin: 0;
-  font-weight: lighter;
-  font-size: 1.75em;
+  font-size: 3rem;
 }
+
+h2 {
+  font-size: 2.25rem;
+}
+
+h3 {
+  font-size: 1.875rem;
+}
+
+h4 {
+  font-size: 1.5rem;
+}
+
+h5 {
+  font-size: 1.25rem;
+}
+
+h6 {
+  font-size: 1.125rem;
+}
+
 p {
   font-size: 1rem;
-  line-height: 1.25rem;
-  margin: 0;
+  line-height: 1.5;
+  max-width: 65ch;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+a:hover {
+  opacity: 0.6;
+}
+
+/* Remove list styles */
+ul, ol {
+  list-style: none;
+}
+
+/* Ensure images and media are responsive */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Inherit fonts for form elements */
+input, button, textarea, select {
+  font: inherit;
 }
