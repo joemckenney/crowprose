@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
-import { tile, tileLink, tileHeader, tileTitle, tileMetadata, tileDescription, tileLinks, tileLinkIcon } from "./index.css";
+import { tile, tileLink, tileHeader, tileTitle, tileMetadata, tileDescription, tileLinks, tileLinkIcon, contributionBadge } from "./index.css";
 
 export interface TileLink {
   type: "github" | "npm" | "website";
   url: string;
 }
+
+export type ContributionType = "pr" | "issue";
 
 interface Props {
   title: string;
@@ -13,6 +15,7 @@ interface Props {
   metadata?: string;
   external?: boolean;
   links?: TileLink[];
+  contributionType?: ContributionType;
 }
 
 const getLinkIcon = (type: TileLink["type"]) => {
@@ -44,7 +47,14 @@ export function Tile(props: Props) {
   const content = (
     <article className={tile}>
       <header className={tileHeader}>
-        <h3 className={tileTitle}>{props.title}</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h3 className={tileTitle}>{props.title}</h3>
+          {props.contributionType && (
+            <span className={contributionBadge} data-type={props.contributionType}>
+              {props.contributionType === "pr" ? "PR" : "Issue"}
+            </span>
+          )}
+        </div>
         {props.metadata && <div className={tileMetadata}>{props.metadata}</div>}
       </header>
       <p className={tileDescription}>{props.description}</p>

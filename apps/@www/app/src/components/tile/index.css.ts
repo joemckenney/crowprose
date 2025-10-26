@@ -79,3 +79,28 @@ export const tileLinkIcon = style({
     outlineOffset: "2px",
   },
 });
+
+export const contributionBadge = style({
+  fontFamily: vars.font.body,
+  fontSize: vars.fontSize.xs,
+  textTransform: "uppercase",
+  letterSpacing: "0.05em",
+  padding: `2px ${vars.spacing["2"]}`,
+  borderRadius: "2px",
+  border: `${vars.borderWidth.base} solid ${vars.color.black}`,
+  backgroundColor: "transparent",
+  fontWeight: vars.fontWeight.medium,
+
+  selectors: {
+    '&[data-type="pr"]': {
+      color: vars.color.black,
+      borderColor: vars.color.black,
+    },
+    '&[data-type="issue"]': {
+      color: vars.color.black,
+      borderColor: vars.color.black,
+      backgroundColor: vars.color.black,
+      color: "white",
+    },
+  },
+});
