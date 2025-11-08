@@ -7,13 +7,14 @@ export default defineConfig({
     extensions: 'modern',
     rollup: {
       inlineDependencies: true,
-
+      emitCJS: false,
       esbuild: {
         target: ['node16'],
         minify: true,
       },
     },
-    declaration: 'compatible',
+    declaration: false,
+    failOnWarn: false,
   },
   format: {
     semi: true,

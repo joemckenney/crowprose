@@ -34,6 +34,13 @@ function App() {
         </div>
         <div className={tileGrid}>
           <Tile
+            title="Weather station"
+            description="Experience your local weather as an AI-generated ambient soundscape. Uses Chrome's built-in AI to interpret real-time weather data into unique Web Audio synthesis."
+            links={[
+              { type: "website", url: "https://joemckenney.com" }
+            ]}
+          />
+          <Tile
             title="Pkg-tools"
             description="An opinionated TypeScript package build toolchain with typed configuration for modern development workflows."
             links={[
@@ -47,13 +54,6 @@ function App() {
             description="A CLI for developing in monorepos, not building them. Focused on developer experience and productivity."
             links={[
               { type: "npm", url: "https://www.npmjs.com/package/@dopt/please" }
-            ]}
-          />
-          <Tile
-            title="Mercator"
-            description="A map implementation that allows for objects as keys without key equality constraints."
-            links={[
-              { type: "npm", url: "https://www.npmjs.com/package/@dopt/mercator" }
             ]}
           />
         </div>
