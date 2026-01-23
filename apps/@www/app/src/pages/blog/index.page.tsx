@@ -13,6 +13,11 @@ export default function Blog() {
 
       <div className={articleList}>
         <Tile
+          title="Building Wake: A Terminal Recorder for the AI Coding Era"
+          description="How I built a tool that records terminal sessions so Claude Code can see what you've been doing—the architecture decisions, PTY handling, and MCP integration."
+          href="/blog/building-wake"
+        />
+        <Tile
           title="Open sourcing code from a private monorepo"
           description="A practical guide to extracting and publishing code from private repositories while maintaining git history and proper attribution."
           href="https://hackernoon.com/open-sourcing-code-from-a-private-monorepo"
