@@ -13,6 +13,13 @@ export default function Projects() {
 
       <div className={projectGrid}>
         <Tile
+          title="Wake"
+          description="Records terminal sessions—commands, outputs, git context—so Claude Code can see what you've been doing. No more copy-pasting."
+          links={[
+            { type: "github", url: "https://github.com/joemckenney/wake" }
+          ]}
+        />
+        <Tile
           title="Weather station"
           description="Experience your local weather as an AI-generated ambient soundscape. Uses Chrome's built-in AI to interpret real-time weather data into unique Web Audio synthesis."
           links={[

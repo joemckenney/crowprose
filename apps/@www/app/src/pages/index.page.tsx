@@ -34,6 +34,13 @@ function App() {
         </div>
         <div className={tileGrid}>
           <Tile
+            title="Wake"
+            description="Records terminal sessions—commands, outputs, git context—so Claude Code can see what you've been doing. No more copy-pasting."
+            links={[
+              { type: "github", url: "https://github.com/joemckenney/wake" }
+            ]}
+          />
+          <Tile
             title="Weather station"
             description="Experience your local weather as an AI-generated ambient soundscape. Uses Chrome's built-in AI to interpret real-time weather data into unique Web Audio synthesis."
             links={[
@@ -47,13 +54,6 @@ function App() {
               { type: "github", url: "https://github.com/pkg-tools/pkg-tools" },
               { type: "website", url: "https://www.pkgtools.com/" },
               { type: "npm", url: "https://www.npmjs.com/settings/pkg-tools/packages" }
-            ]}
-          />
-          <Tile
-            title="Please"
-            description="A CLI for developing in monorepos, not building them. Focused on developer experience and productivity."
-            links={[
-              { type: "npm", url: "https://www.npmjs.com/package/@dopt/please" }
             ]}
           />
         </div>
