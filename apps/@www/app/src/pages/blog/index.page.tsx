@@ -13,9 +13,9 @@ export default function Blog() {
 
       <div className={articleList}>
         <Tile
-          title="Building Wake: A Terminal Recorder for the AI Coding Era"
+          title="Wake: Terminal History for Claude Code"
           description="How I built a tool that records terminal sessions so Claude Code can see what you've been doing—the architecture decisions, PTY handling, and MCP integration."
-          href="/blog/building-wake"
+          href="/blog/wake"
         />
         <Tile
           title="Open sourcing code from a private monorepo"

@@ -68,9 +68,9 @@ function App() {
         </div>
         <div className={tileGrid}>
           <Tile
-            title="Building Wake: A Terminal Recorder for the AI Coding Era"
+            title="Wake: Terminal History for Claude Code"
             description="How I built a tool that records terminal sessions so Claude Code can see what you've been doing."
-            href="/blog/building-wake"
+            href="/blog/wake"
           />
           <Tile
             title="Open sourcing code from a private monorepo"
