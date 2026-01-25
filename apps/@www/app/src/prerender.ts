@@ -5,11 +5,16 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const SITE_URL = "https://crowprose.com";
+const AUTHOR_NAME = "Joe McKenney";
 
 interface RouteMeta {
   title: string;
   description: string;
   image?: string;
+  // Blog-specific metadata
+  type?: "article" | "website";
+  publishedTime?: string;
+  modifiedTime?: string;
 }
 
 // Define route metadata for SEO and Open Graph
@@ -26,6 +31,9 @@ const routeMeta: Record<string, RouteMeta> = {
     title: "Wake: Terminal History for Claude Code",
     description: "A tool that records terminal sessions so Claude Code can see what you've been doing—the architecture decisions, PTY handling, and MCP integration.",
     image: "/og/wake.png",
+    type: "article",
+    publishedTime: "2025-01-20",
+    modifiedTime: "2025-01-20",
   },
   "/projects": {
     title: "Projects | Joe McKenney",
@@ -40,25 +48,89 @@ const routeMeta: Record<string, RouteMeta> = {
 // Define the routes to pre-render
 const routes = Object.keys(routeMeta);
 
+function generateJsonLd(route: string, meta: RouteMeta, url: string, image: string): string {
+  const isArticle = meta.type === "article";
+
+  if (isArticle) {
+    const articleSchema = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: meta.title,
+      description: meta.description,
+      image: image,
+      url: url,
+      author: {
+        "@type": "Person",
+        name: AUTHOR_NAME,
+        url: SITE_URL,
+      },
+      publisher: {
+        "@type": "Person",
+        name: AUTHOR_NAME,
+        url: SITE_URL,
+      },
+      datePublished: meta.publishedTime,
+      dateModified: meta.modifiedTime || meta.publishedTime,
+      mainEntityOfPage: {
+        "@type": "WebPage",
+        "@id": url,
+      },
+    };
+    return `<script type="application/ld+json">${JSON.stringify(articleSchema)}</script>`;
+  }
+
+  // Default website schema
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: AUTHOR_NAME,
+    url: SITE_URL,
+    author: {
+      "@type": "Person",
+      name: AUTHOR_NAME,
+    },
+  };
+  return `<script type="application/ld+json">${JSON.stringify(websiteSchema)}</script>`;
+}
+
 function generateMetaTags(route: string): string {
   const meta = routeMeta[route];
   if (!meta) return "";
 
   const url = `${SITE_URL}${route === "/" ? "" : route}`;
   const image = meta.image ? `${SITE_URL}${meta.image}` : `${SITE_URL}/og/default.png`;
+  const isArticle = meta.type === "article";
 
-  return `
+  let tags = `
     <title>${meta.title}</title>
     <meta name="description" content="${meta.description}" />
+    <link rel="canonical" href="${url}" />
     <meta property="og:title" content="${meta.title}" />
     <meta property="og:description" content="${meta.description}" />
     <meta property="og:url" content="${url}" />
     <meta property="og:image" content="${image}" />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="${isArticle ? "article" : "website"}" />
+    <meta property="og:site_name" content="${AUTHOR_NAME}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${meta.title}" />
     <meta name="twitter:description" content="${meta.description}" />
     <meta name="twitter:image" content="${image}" />`;
+
+  // Add article-specific meta tags
+  if (isArticle) {
+    if (meta.publishedTime) {
+      tags += `\n    <meta property="article:published_time" content="${meta.publishedTime}" />`;
+    }
+    if (meta.modifiedTime) {
+      tags += `\n    <meta property="article:modified_time" content="${meta.modifiedTime}" />`;
+    }
+    tags += `\n    <meta property="article:author" content="${AUTHOR_NAME}" />`;
+  }
+
+  // Add JSON-LD structured data
+  tags += `\n    ${generateJsonLd(route, meta, url, image)}`;
+
+  return tags;
 }
 
 async function prerender() {
@@ -106,7 +178,38 @@ async function prerender() {
     }
   }
 
+  // Generate sitemap.xml
+  generateSitemap(clientDir);
+
   console.log("Pre-rendering complete!");
+}
+
+function generateSitemap(clientDir: string): void {
+  const today = new Date().toISOString().split("T")[0];
+
+  const urls = routes.map((route) => {
+    const meta = routeMeta[route];
+    const loc = route === "/" ? SITE_URL : `${SITE_URL}${route}`;
+    const lastmod = meta?.modifiedTime || today;
+    const priority = route === "/" ? "1.0" : route === "/blog" ? "0.9" : route.startsWith("/blog/") ? "0.8" : "0.7";
+    const changefreq = route.startsWith("/blog/") ? "monthly" : "weekly";
+
+    return `  <url>
+    <loc>${loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+  });
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.join("\n")}
+</urlset>`;
+
+  const sitemapPath = path.join(clientDir, "sitemap.xml");
+  fs.writeFileSync(sitemapPath, sitemap);
+  console.log(`Generated: ${sitemapPath}`);
 }
 
 prerender().catch((error) => {
