@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@vanilla-extract/css": "1.15.2",
+    "posthog-js": "1.335.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.23.1"
