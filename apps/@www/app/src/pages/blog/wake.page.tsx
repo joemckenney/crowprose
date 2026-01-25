@@ -119,7 +119,7 @@ wake shell`}</code></pre>
         <p>
           Then add the MCP server to Claude Code:
         </p>
-        <pre><code>{`claude mcp add --transport stdio --scope user wake-mcp -- wake-mcp`}</code></pre>
+        <pre><code>{"claude mcp add --transport stdio --scope user wake-mcp -- wake-mcp"}</code></pre>
         <p>
           The code is at <a href="https://github.com/joemckenney/wake">github.com/joemckenney/wake</a>. It's early, rough around some edges, but it works. Feedback welcome.
         </p>
