@@ -6,6 +6,7 @@ export default defineConfig({
   build: {
     ssr: true,
     outDir: "dist/server",
+    emptyOutDir: false,
     rollupOptions: {
       input: {
         prerender: "./src/prerender.ts",
