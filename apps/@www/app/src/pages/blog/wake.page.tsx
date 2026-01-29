@@ -75,10 +75,16 @@ precmd() { log_exit_code $? }`}</code></pre>
           The real payoff is the MCP server. Claude Code supports Model Context Protocol, which lets you expose tools that Claude can call. Wake's MCP server provides:
         </p>
         <ul>
-          <li><code>get_recent_sessions</code> — list recent terminal sessions</li>
-          <li><code>get_session_commands</code> — commands from a specific session</li>
-          <li><code>search_commands</code> — search across all history</li>
+          <li><code>wake_status</code> — current session info</li>
+          <li><code>wake_list_commands</code> — lightweight metadata (command, exit code, output size, summary)</li>
+          <li><code>wake_get_output</code> — fetch full output for specific commands</li>
+          <li><code>wake_search</code> — search across all history</li>
+          <li><code>wake_dump</code> — export a session as markdown context</li>
+          <li><code>wake_annotate</code> — add notes to sessions</li>
         </ul>
+        <p>
+          The key design is tiered retrieval: <code>wake_list_commands</code> returns metadata and summaries first, letting Claude decide what's relevant before fetching full output with <code>wake_get_output</code>. This keeps context usage efficient—no more burning tokens on irrelevant build logs.
+        </p>
         <p>
           Now when you ask Claude "why did my deploy fail?", it can pull the relevant terminal output directly instead of you having to explain.
         </p>
@@ -101,13 +107,18 @@ max_mb = 5     # default`}</code></pre>
           Environment variables work too (<code>WAKE_RETENTION_DAYS</code>, <code>WAKE_MAX_OUTPUT_MB</code>) if you prefer that style.
         </p>
 
+        <h2>LLM Summarization</h2>
+        <p>
+          As of v0.5.0, wake ships with local LLM summarization enabled by default. The goal was to make tiered retrieval actually useful—returning "command failed" isn't helpful, but returning "3 tests failed: auth timeout in login_test, null pointer in user_service, missing mock in api_test" lets Claude understand context without fetching megabytes of raw output.
+        </p>
+        <p>
+          The implementation uses <strong>llama.cpp with Qwen2.5-0.5B</strong>, a ~468MB model that downloads on first use. It runs locally on CPU with no API calls—your terminal history never leaves your machine. If you have a GPU, you can build with CUDA or Metal support for faster inference, but it's not required.
+        </p>
+        <p>
+          Summaries are generated automatically as commands complete and stored alongside the raw output. The MCP tools return these summaries in metadata responses, so Claude can triage what's relevant before deciding what to fetch in full.
+        </p>
+
         <h2>What's Next</h2>
-        <p>
-          A few things I haven't built yet:
-        </p>
-        <p>
-          <strong>Smarter retrieval</strong>: Right now the MCP tools return full command output, which burns through context fast. The better approach is tiered retrieval—return lightweight metadata first (command, exit code, output size, summary), let Claude decide what's relevant, then fetch full output for just those commands. Good summaries require an LLM, which means either API calls (cost, privacy concerns) or bundling local inference. I'm leaning toward shipping a small model via candle (Rust-native ML) that downloads on first use. Keeps it self-contained—install once, summarization just works.
-        </p>
         <p>
           <strong>Editor integration</strong>: Terminal is only half the picture. File changes, what you had open, what you were looking at—all relevant context that's currently not captured. Filesystem watching via inotify/FSEvents is straightforward, but deciding what's signal versus noise is the hard part.
         </p>
@@ -121,7 +132,7 @@ wake shell`}</code></pre>
         </p>
         <pre><code>{"claude mcp add --transport stdio --scope user wake-mcp -- wake-mcp"}</code></pre>
         <p>
-          The code is at <a href="https://github.com/joemckenney/wake">github.com/joemckenney/wake</a>. It's early, rough around some edges, but it works. Feedback welcome.
+          The code is at <a href="https://github.com/joemckenney/wake">github.com/joemckenney/wake</a>. With v0.5.0, the core features—session recording, tiered retrieval, and local summarization—are stable. Feedback welcome.
         </p>
       </article>
     </div>
