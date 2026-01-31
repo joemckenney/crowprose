@@ -109,10 +109,10 @@ max_mb = 5     # default`}</code></pre>
 
         <h2>LLM Summarization</h2>
         <p>
-          As of v0.5.0, wake ships with local LLM summarization enabled by default. The goal was to make tiered retrieval actually useful—returning "command failed" isn't helpful, but returning "3 tests failed: auth timeout in login_test, null pointer in user_service, missing mock in api_test" lets Claude understand context without fetching megabytes of raw output.
+          As of v0.6.0, wake ships with local LLM summarization enabled by default. The goal was to make tiered retrieval actually useful—returning "command failed" isn't helpful, but returning "3 tests failed: auth timeout in login_test, null pointer in user_service, missing mock in api_test" lets Claude understand context without fetching megabytes of raw output.
         </p>
         <p>
-          The implementation uses <strong>llama.cpp with Qwen2.5-0.5B</strong>, a ~468MB model that downloads on first use. It runs locally on CPU with no API calls—your terminal history never leaves your machine. If you have a GPU, you can build with CUDA or Metal support for faster inference, but it's not required.
+          The implementation uses <strong>llama.cpp with Qwen3-0.6B</strong>, a ~380MB model that downloads on first use. It runs locally on CPU with no API calls—your terminal history never leaves your machine. If you have a GPU, you can build with CUDA or Metal support for faster inference, but it's not required.
         </p>
         <p>
           Summaries are generated automatically as commands complete and stored alongside the raw output. The MCP tools return these summaries in metadata responses, so Claude can triage what's relevant before deciding what to fetch in full.
@@ -132,7 +132,7 @@ wake shell`}</code></pre>
         </p>
         <pre><code>{"claude mcp add --transport stdio --scope user wake-mcp -- wake-mcp"}</code></pre>
         <p>
-          The code is at <a href="https://github.com/joemckenney/wake">github.com/joemckenney/wake</a>. With v0.5.0, the core features—session recording, tiered retrieval, and local summarization—are stable. Feedback welcome.
+          The code is at <a href="https://github.com/joemckenney/wake">github.com/joemckenney/wake</a>. With v0.6.0, the core features—session recording, tiered retrieval, and local summarization—are stable. Feedback welcome.
         </p>
       </article>
     </div>
