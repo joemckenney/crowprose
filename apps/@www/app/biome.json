@@ -10,7 +10,8 @@
         "noAccumulatingSpread": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "off"
       },
       "recommended": true
     }
