@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import matter from "gray-matter";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -17,8 +18,8 @@ interface RouteMeta {
   modifiedTime?: string;
 }
 
-// Define route metadata for SEO and Open Graph
-const routeMeta: Record<string, RouteMeta> = {
+// Static route metadata for non-MDX pages
+const staticRouteMeta: Record<string, RouteMeta> = {
   "/": {
     title: "Joe McKenney",
     description: "Software engineer. Building tools and writing about it.",
@@ -35,6 +36,10 @@ const routeMeta: Record<string, RouteMeta> = {
     publishedTime: "2025-01-20",
     modifiedTime: "2025-01-20",
   },
+  "/blog/flight-patterns": {
+    title: "Flight Patterns | Joe McKenney",
+    description: "Browser AI to production K8s. The long way around.",
+  },
   "/projects": {
     title: "Projects | Joe McKenney",
     description: "Open source projects and side work.",
@@ -44,6 +49,70 @@ const routeMeta: Record<string, RouteMeta> = {
     description: "Open source contributions and community involvement.",
   },
 };
+
+// Format date as ISO date string (YYYY-MM-DD)
+function formatDate(date: unknown): string | undefined {
+  if (!date) return undefined;
+  if (date instanceof Date) {
+    return date.toISOString().split("T")[0];
+  }
+  if (typeof date === "string") {
+    return date;
+  }
+  return undefined;
+}
+
+// Discover MDX files and extract frontmatter
+function discoverMdxPosts(srcDir: string): Record<string, RouteMeta> {
+  const mdxMeta: Record<string, RouteMeta> = {};
+  const pagesDir = path.join(srcDir, "pages", "blog");
+
+  function walkDir(dir: string) {
+    if (!fs.existsSync(dir)) return;
+
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walkDir(fullPath);
+      } else if (entry.name.endsWith(".mdx")) {
+        const content = fs.readFileSync(fullPath, "utf-8");
+        const { data } = matter(content);
+
+        if (data.title && data.description) {
+          // Convert file path to route
+          const relativePath = path.relative(path.join(srcDir, "pages"), fullPath);
+          const route = "/" + relativePath.replace(/\.mdx$/, "");
+
+          const publishedTime = formatDate(data.publishedTime);
+          const modifiedTime = formatDate(data.modifiedTime) || publishedTime;
+
+          mdxMeta[route] = {
+            title: data.title,
+            description: data.description,
+            image: data.image,
+            type: "article",
+            publishedTime,
+            modifiedTime,
+          };
+        }
+      }
+    }
+  }
+
+  walkDir(pagesDir);
+  return mdxMeta;
+}
+
+// Build complete route metadata by merging static and MDX-discovered routes
+function buildRouteMeta(srcDir: string): Record<string, RouteMeta> {
+  const mdxMeta = discoverMdxPosts(srcDir);
+  return { ...staticRouteMeta, ...mdxMeta };
+}
+
+// Get the source directory (relative to the prerender script location in dist/server/)
+const srcDir = path.resolve(__dirname, "..", "..", "src");
+const routeMeta = buildRouteMeta(srcDir);
 
 // Define the routes to pre-render
 const routes = Object.keys(routeMeta);

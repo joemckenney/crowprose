@@ -1,21 +1,10 @@
 import { Link } from "react-router-dom";
+import { getSeriesPosts } from "../../../lib/posts";
 import { page, header, title, description, postList, postItem, postTitle, postDescription } from "./index.css";
 
-const posts = [
-  {
-    slug: "db-cli",
-    title: "A Multi-Environment Database CLI",
-    description: "One command to access local, minikube, and production databases. Config discovery, Kubernetes secret reading, and why Bun makes CLI tools fun to write.",
-  },
-  // Future posts:
-  // {
-  //   slug: "sdk-generation",
-  //   title: "Spec Packages as Contracts",
-  //   description: "How services generate OpenAPI specs that feed into typed client libraries without circular dependencies.",
-  // },
-];
-
 export default function FlightPatterns() {
+  const posts = getSeriesPosts("flight-patterns");
+
   return (
     <div className={page}>
       <header className={header}>
@@ -29,7 +18,7 @@ export default function FlightPatterns() {
       <ul className={postList}>
         {posts.map((post) => (
           <li key={post.slug} className={postItem}>
-            <Link to={`/blog/flight-patterns/${post.slug}`}>
+            <Link to={post.slug}>
               <span className={postTitle}>{post.title}</span>
               <span className={postDescription}>{post.description}</span>
             </Link>

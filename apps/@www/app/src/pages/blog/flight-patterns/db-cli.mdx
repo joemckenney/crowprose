@@ -1,0 +1,142 @@
+---
+title: A Multi-Environment Database CLI
+description: One command to access local, minikube, and production databases. Config discovery, Kubernetes secret reading, and why Bun makes CLI tools fun to write.
+publishedTime: 2025-02-01
+series: flight-patterns
+---
+
+import { CodeBlock } from "../../../components/code-block";
+import { MdxLayout } from "../../../components/mdx-layout";
+
+export const REPO = "https://github.com/joemckenney/website/blob/main";
+
+<MdxLayout frontmatter={frontmatter}>
+
+At [Dopt](https://www.dopt.com)—a company I co-founded before joining Airtable—accessing our databases meant remembering different incantations for each environment. Local was `docker exec -it postgres psql`. Minikube required `kubectl port-forward`, then grabbing the password from a Kubernetes secret, then connecting. Production required the same dance but with a different kubeconfig. Three environments, three workflows, three sets of commands to forget—multiplied across every service with its own database.
+
+I wanted one command. A well-designed CLI hides complexity behind a simple interface—the environment is a flag, the database is discovered from context, everything else is handled.
+
+## The Interface
+
+Here's what I built (<a href={`${REPO}/packages/@cli/db/bin/db.ts`}>db.ts</a>):
+
+<CodeBlock language="bash">{`db shell               # psql to local docker
+db shell --minikube    # psql to local kubernetes
+db shell --prod        # psql to production (asks for confirmation)
+
+db dump --prod         # dump production database
+db dump --prod --schema-only  # just the schema`}</CodeBlock>
+
+Same command, same mental model. The environment flag is the only thing that changes. Run it from anywhere in a database package directory and it figures out which database you mean.
+
+## No Build Step
+
+The whole CLI is a <a href={`${REPO}/packages/@cli/db/bin/db.ts`}>single TypeScript file</a> with a shebang. No `tsc` watching. The `package.json` bin field points directly at the `.ts` file:
+
+<CodeBlock language="json">{`{
+  "bin": { "db": "bin/db.ts" }
+}`}</CodeBlock>
+
+I used Bun for the ergonomics—`Bun.spawn` makes subprocess management clean, `await Bun.file(path).json()` makes reading config trivial. The result: ~200 lines of readable TypeScript that runs instantly.
+
+## The Plumbing
+
+The individual commands (<a href={`${REPO}/packages/@cli/db/src/commands/shell.ts`}>shell.ts</a>, <a href={`${REPO}/packages/@cli/db/src/commands/dump.ts`}>dump.ts</a>) are thin. The interesting part is the <a href={`${REPO}/packages/@cli/db/src/utils.ts`}>shared utilities</a> they all use.
+
+**Port-forward lifecycle.** For Kubernetes environments, every command needs to start a `kubectl port-forward`, hold it open while working, and clean it up on exit:
+
+<CodeBlock language="typescript">{`let portForwardProcess: Subprocess | null = null;
+
+export async function startPortForward(env: "minikube" | "prod", config: DbConfig) {
+  portForwardProcess = Bun.spawn(
+    ["kubectl", "port-forward", \`svc/\${service}\`, \`\${localPort}:5432\`],
+    { stdout: "pipe", stderr: "pipe", env: { ...process.env, KUBECONFIG } }
+  );
+  await Bun.sleep(2000);
+}
+
+export function stopPortForward() {
+  portForwardProcess?.kill();
+  portForwardProcess = null;
+}`}</CodeBlock>
+
+**Cleanup on Ctrl+C.** Signal handling ensures the port-forward gets killed even if you interrupt mid-operation:
+
+<CodeBlock language="typescript">{`export function setupCleanup() {
+  process.on("SIGINT", () => {
+    stopPortForward();
+    process.exit(0);
+  });
+}`}</CodeBlock>
+
+**Production confirmation.** Any command touching prod requires typing "yes":
+
+<CodeBlock language="typescript">{`export async function confirmProdAccess(): Promise<boolean> {
+  console.log("⚠️  WARNING: You are connected to PRODUCTION data!");
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) => {
+    rl.question("Type 'yes' to continue: ", (answer) => {
+      rl.close();
+      resolve(answer.trim().toLowerCase() === "yes");
+    });
+  });
+}`}</CodeBlock>
+
+**Reading secrets from Kubernetes.** The password lives in different places per environment. Local dev uses an environment variable. Kubernetes environments store it in a secret:
+
+<CodeBlock language="typescript">{`export async function getPassword(env: Environment, config: DbConfig) {
+  if (env === "dev") return process.env.DB_PASSWORD || "devpassword";
+
+  const proc = Bun.spawn(
+    ["sh", "-c", \`kubectl get secret \${service} -o jsonpath='{.data.password}' | base64 -d\`],
+    { stdout: "pipe" }
+  );
+  return (await new Response(proc.stdout).text()).trim();
+}`}</CodeBlock>
+
+The CLI handles kubeconfig switching, secret lookup, and base64 decoding. You just type `db shell --prod` and you're in.
+
+## Config Discovery
+
+How does `db` know which database you're talking about? It <a href={`${REPO}/packages/@cli/db/src/config.ts`}>walks up the directory tree</a> looking for `db.config.json`:
+
+<CodeBlock language="typescript">{`export async function loadConfig(): Promise<DbConfig> {
+  let dir = process.cwd();
+  while (dir !== "/") {
+    const configPath = join(dir, "db.config.json");
+    if (existsSync(configPath)) return await Bun.file(configPath).json();
+    dir = join(dir, "..");
+  }
+  throw new Error("Could not find db.config.json");
+}`}</CodeBlock>
+
+This mirrors how eslint and prettier find their configs. The <a href={`${REPO}/services/@users/db/db.config.json`}>config file</a> lives next to the Prisma schema and migrations—everything about that database in one place:
+
+<CodeBlock language="json">{`{
+  "database": "users",
+  "user": "users",
+  "environments": {
+    "dev": { "host": "localhost", "port": 5432 },
+    "minikube": { "service": "user-postgres-postgresql", "localPort": 5440 },
+    "prod": { "service": "user-postgres-postgresql", "localPort": 5440, "kubeconfig": "~/.kube/vultr-prod-config" }
+  }
+}`}</CodeBlock>
+
+## What's Missing
+
+This is a solo developer's tool, not production infrastructure. It doesn't handle:
+
+- **Secret rotation** — Reads the password fresh each time, but no rotation mechanism built in.
+- **Team credential management** — Everyone needs their own kubeconfig.
+- **Connection pooling** — Each invocation opens a new connection.
+- **Audit logging** — No record of who accessed what database, when.
+- **Dump file hygiene** — Nothing prevents you from committing `.sql` files with production data. The `dumps/` directory should probably be gitignored.
+- **Better error messages** — Wrong kubectl context gives a generic port-forward error rather than "you're pointing at the wrong cluster."
+
+For a personal project, these gaps don't matter. For a team, you'd want something more robust—or just use a managed database proxy.
+
+## Up Next
+
+This is the first post in **Flight Patterns**, a series about the patterns and tradeoffs in my [playground repo](https://github.com/joemckenney/website). Next up: the three-tier SDK generation pattern—how services generate OpenAPI specs that feed into typed client libraries without circular dependencies.
+
+</MdxLayout>

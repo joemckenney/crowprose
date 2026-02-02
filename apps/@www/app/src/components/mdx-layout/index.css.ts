@@ -1,5 +1,5 @@
 import { style, globalStyle } from "@vanilla-extract/css";
-import { vars } from "../../../styles/tokens.css";
+import { vars } from "../../styles/tokens.css";
 
 export const page = style({
   maxWidth: vars.maxWidth.narrow,
@@ -107,4 +107,3 @@ globalStyle(`${article} ul`, {
 globalStyle(`${article} li`, {
   marginBottom: vars.spacing["2"],
 });
-
