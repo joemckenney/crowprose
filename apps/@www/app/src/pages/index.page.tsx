@@ -68,6 +68,11 @@ function App() {
         </div>
         <div className={tileGrid}>
           <Tile
+            title="Flight Patterns"
+            description="Browser AI to production K8s. The long way around."
+            href="/blog/flight-patterns"
+          />
+          <Tile
             title="Wake: Terminal History for Claude Code"
             description="How I built a tool that records terminal sessions so Claude Code can see what you've been doing."
             href="/blog/wake"

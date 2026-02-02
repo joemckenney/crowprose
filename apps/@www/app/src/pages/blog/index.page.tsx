@@ -13,6 +13,11 @@ export default function Blog() {
 
       <div className={articleList}>
         <Tile
+          title="Flight Patterns"
+          description="Browser AI to production K8s. The long way around."
+          href="/blog/flight-patterns"
+        />
+        <Tile
           title="Wake: Terminal History for Claude Code"
           description="How I built a tool that records terminal sessions so Claude Code can see what you've been doing—the architecture decisions, PTY handling, and MCP integration."
           href="/blog/wake"
