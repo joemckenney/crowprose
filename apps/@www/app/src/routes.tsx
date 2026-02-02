@@ -4,13 +4,19 @@ import { Routes as Switch, Route } from "react-router-dom";
 
 interface PageModule {
 	default: ComponentType;
+	frontmatter?: {
+		title?: string;
+		description?: string;
+		publishedTime?: string;
+		series?: string;
+	};
 }
 
 const PRESERVED = import.meta.glob("/src/pages/(_app|404).page.tsx", {
 	eager: true,
 }) as Record<string, PageModule>;
 
-const ROUTES = import.meta.glob("/src/pages/**/[a-z[]*.page.tsx", {
+const ROUTES = import.meta.glob("/src/pages/**/[a-z[]*.{page.tsx,mdx}", {
 	eager: true,
 }) as Record<string, PageModule>;
 
@@ -37,6 +43,8 @@ for (const path of Object.keys(ROUTES)) {
 		// `pages/blog/[...catch-all].page.js → /blog/**/*`
 		// `pages/flows/[id].page.js → /flows/33`
 		.replace(/\.page\.tsx$/g, "")
+		// MDX files: `pages/blog/post.mdx → /blog/post`
+		.replace(/\.mdx$/g, "")
 		// We are in ./client/config
 		// Pages are in ./client/pages
 		// Remove `../pages`

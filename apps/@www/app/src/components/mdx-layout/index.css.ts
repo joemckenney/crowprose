@@ -20,21 +20,26 @@ export const page = style({
 export const header = style({
 	display: "flex",
 	flexDirection: "column",
-	gap: vars.spacing["4"],
+	gap: vars.spacing["3"],
 	borderBottom: `${vars.borderWidth.thick} solid ${vars.color.black}`,
 	paddingBottom: vars.spacing["6"],
 });
 
-export const headerContent = style({
-	display: "flex",
-	alignItems: "flex-start",
-	gap: vars.spacing["4"],
+export const seriesLink = style({
+	textDecoration: "none",
 });
 
-export const logo = style({
-	width: "48px",
-	height: "48px",
-	flexShrink: 0,
+export const seriesTag = style({
+	fontFamily: vars.font.mono,
+	fontSize: vars.fontSize.sm,
+	textTransform: "uppercase",
+	letterSpacing: "0.1em",
+	color: vars.color.textSecondary,
+	selectors: {
+		[`${seriesLink}:hover &`]: {
+			color: vars.color.text,
+		},
+	},
 });
 
 export const title = style({
@@ -84,38 +89,28 @@ globalStyle(`${article} a:hover`, {
 
 globalStyle(`${article} code`, {
 	fontFamily: vars.font.mono,
-	fontSize: vars.fontSize.base,
+	fontSize: "0.9em",
 	backgroundColor: vars.color.gray100,
 	padding: "2px 6px",
 	borderRadius: vars.borderRadius.sm,
-});
-
-globalStyle(`${article} pre`, {
-	fontFamily: vars.font.mono,
-	fontSize: vars.fontSize.sm,
-	backgroundColor: vars.color.gray900,
-	color: vars.color.gray100,
-	padding: vars.spacing["4"],
-	borderRadius: vars.borderRadius.base,
-	overflowX: "auto",
-	marginBottom: vars.spacing["4"],
-});
-
-globalStyle(`${article} pre code`, {
-	backgroundColor: "transparent",
-	padding: 0,
-	color: "inherit",
 });
 
 globalStyle(`${article} strong`, {
 	fontWeight: vars.fontWeight.bold,
 });
 
-globalStyle(`${article} ul, ${article} ol`, {
+globalStyle(`${article} ul`, {
 	marginBottom: vars.spacing["4"],
 	paddingLeft: vars.spacing["6"],
 });
 
 globalStyle(`${article} li`, {
 	marginBottom: vars.spacing["2"],
+});
+
+globalStyle(`${article} hr`, {
+	border: "none",
+	borderTop: `1px solid ${vars.color.gray200}`,
+	marginTop: vars.spacing["8"],
+	marginBottom: vars.spacing["8"],
 });
