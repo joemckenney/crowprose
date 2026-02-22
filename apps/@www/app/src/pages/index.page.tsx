@@ -19,7 +19,7 @@ function App() {
 			<header className={masthead}>
 				<h1 className={brand}>Crowprose</h1>
 				<p className={tagline}>
-					Software engineer, animal dad, husband, and lifelong athlete. Building
+					Software engineer, new dad, husband, and lifelong athlete. Building
 					tools and sharing thoughts on software development.
 				</p>
 				<SocialLinks />
